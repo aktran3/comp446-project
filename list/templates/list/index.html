@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Media List</title>
+</head>
+<body>
+    {% if entry_list %}
+        <ul>
+            {% for entry in entry_list %}
+                <li>{{entry.title}} Rating: {{entry.rating}}/10 Episodes: {{entry.episodeCount}}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This list is empty</p>
+    {% endif %}
+</body>
