@@ -21,4 +21,5 @@ from list import views as list_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('list/', list_views.index, name='index'),
+    path('list/add', list_views.add_entry, name='add_entry')
 ]

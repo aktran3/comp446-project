@@ -13,4 +13,13 @@
     {% else %}
         <p>This list is empty</p>
     {% endif %}
+    <form id="add entry" action="/list/add" method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Show Title">
+        <label for="rating">Rating:</label>
+        <input type="number" name="rating">
+        <label for="episodeCount">Episode Count:</label>
+        <input type="number" name="episodeCount">
+        <input type="submit" value="Add Entry">
+    </form>
 </body>
