@@ -4,16 +4,21 @@
     <title>Media List</title>
 </head>
 <body>
+    {% if user.is_authenticated %}
+        <h3>{{list_title}}</h3>
+        <a href="/list">Back</a>
+        <a href="{% url 'logout' %}">Sign Out</a>
+    {% endif %}
     {% if entry_list %}
         <ul>
             {% for entry in entry_list %}
-                <li>{{entry.title}} Rating: {{entry.rating}}/10 Episodes: {{entry.episodeCount}}</li>
+                <li>{{entry.title}} | Rating: {{entry.rating}}/10 | Episodes: {{entry.episodeCount}}</li>
             {% endfor %}
         </ul>
     {% else %}
         <p>This list is empty</p>
     {% endif %}
-    <form id="add entry" action="/list/add" method="post">
+    <form id="add entry" action="{{list_id}}/add" method="post">
         {% csrf_token %}
         <input type="text" name="title" placeholder="Show Title">
         <label for="rating">Rating:</label>

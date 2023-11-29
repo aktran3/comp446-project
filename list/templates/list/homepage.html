@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Show Me</title>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <p>well aren't you fancy.</p>
+    {% else %}
+        <p>this is a website. wow! so cool!</p>
+        <a href="{% url 'login' %}">go log in NOW</a>
+        <a href="{% url 'new_user' %}">or create a new account i guess</a>
+    {% endif %}
+</body>

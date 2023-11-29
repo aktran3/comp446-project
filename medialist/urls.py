@@ -19,7 +19,13 @@ from django.urls import path, include, re_path
 from list import views as list_views
 
 urlpatterns = [
+    path('', list_views.homepage, name='homepage'),
     path('admin/', admin.site.urls),
     path('list/', list_views.index, name='index'),
-    path('list/add', list_views.add_entry, name='add_entry')
+    path('list/<int:id>', list_views.list, name='list'),
+    path('list/<int:id>/add', list_views.add_entry, name='add_entry'),
+    path('list/createnew', list_views.create_list, name='create_list'),
+    path('', include("django.contrib.auth.urls")),
+    path('new_user/', list_views.new_user, name='new_user'),
+    path('new_user/create', list_views.create_user, name='create_user'),
 ]

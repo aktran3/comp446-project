@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Media List</title>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}!</p>
+        <a href="{% url 'logout' %}">Sign Out</a>
+        {% if user_lists %}
+            <ul>
+                {% for list in user_lists %}
+                    <li>
+                        <a href="{{list.listid}}">{{list.listname}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You don't have any lists! Why not add one?</p>
+        {% endif %}
+        <form id="add entry" action="/list/createnew" method="post">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="List Title">
+            <input type="submit" value="Create New List">
+        </form>
+    {% else %}
+        <p>Unable to display page.</p>
+        <a href="{% url 'login' %}">Please log in to view.</a>
+    {% endif %}
+</body>
