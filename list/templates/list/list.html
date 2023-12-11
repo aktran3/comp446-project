@@ -6,21 +6,178 @@
         <a href="/list">Back</a>
     {% endif %}
     {% if entry_list %}
-        <ul>
+        <ul id="show_list">
             {% for entry in entry_list %}
-                <li>{{entry.title}} | Rating: {{entry.rating}}/10 | Episodes: {{entry.episodeCount}}</li>
+                <li>
+                    {% if entry.onlyEpisodes %}
+                        {{entry.title}} | Episodes: {{entry.episodeCount}}
+                        <div class="current_place">Current Episode: {{entry.currentEpisode}}</div>
+                        <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
+                        data-season="no" data-episode="{{entry.currentEpisode}}">
+                    {% else %}
+                        {{entry.title}} | Seasons: {{entry.seasonCount}} | Episodes: {{entry.episodeCount}}
+                        <div class="current_place">Current Season: {{entry.currentSeason}} | Current Episode: {{entry.currentEpisode}}</div>
+                        <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
+                        data-season="{{entry.currentSeason}}" data-episode="{{entry.currentEpisode}}">
+                    {% endif %}
+                    <input type="button" class="delete_button" value="Delete Entry" data-entry="{{entry.entryid}}">
+                </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>This list is empty</p>
+        <p id="empty_list_notif">This list is empty!</p>
+        <ul id="show_list"> 
+        </ul>
     {% endif %}
-    <form id="add entry" action="{{list_id}}/add" method="post">
+    <div id="add_auto_entry">
+        <input type="text" id="show_name_auto" name="show_name_auto" placeholder="Enter the name of a show...">
+        <input type="button" id="add_show_auto" name="add_show_auto" value="Add to list">
+        <p id="input_error">Error finding show. Make sure the title is spelled and capitialized correctly.</p>
+    </div>
+    <form id="add_custom_entry" action="{{list_id}}/add_custom" method="post">
         {% csrf_token %}
         <input type="text" name="title" placeholder="Show Title">
-        <label for="rating">Rating:</label>
-        <input type="number" name="rating">
+        <label for="seasons">Season Count:</label>
+        <input type="number" name="seasonCount">
         <label for="episodeCount">Episode Count:</label>
         <input type="number" name="episodeCount">
-        <input type="submit" value="Add Entry">
+        <input type="checkbox" name="onlyEpisodes">
+        <label for="episodeCount">Don't Count Seasons</label>
+        <input type="submit" id="add_show_custom" value="Add to List">
     </form>
-{% endblock %}
+    </br>
+    <input type="button" id="entry_mode_button" value="Switch to manual show entry">
+    {% csrf_token %}
+    <script>
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+
+        let autoEntryMode = true
+        
+        let showAutoInput = document.getElementById("show_name_auto")
+        let showAutoSubmit = document.getElementById("add_show_auto")
+
+        let customEntryForm = document.getElementById("add_custom_entry")
+        customEntryForm.hidden = true
+        let autoEntryForm = document.getElementById("add_auto_entry")
+
+        document.getElementById("entry_mode_button").onclick = function() {
+            autoEntryMode = !autoEntryMode
+            if (autoEntryMode) {
+                customEntryForm.hidden = true
+                autoEntryForm.hidden = false
+                this.value = "Switch to manual show entry"
+            } else {
+                customEntryForm.hidden = false
+                autoEntryForm.hidden = true
+                inputError.hidden = true
+                this.value = "Switch to automatic show entry"
+            }
+        }
+
+        async function deleteEntry() {
+                this.parentElement.remove()
+                let response = await fetch("{{list_id}}/delete", {
+                    method: "POST",
+                    body: this.dataset.entry,
+                    mode: "same-origin",
+                    headers: {'X-CSRFToken': csrftoken},
+                })
+            }
+        
+        let deleteButtons = document.getElementsByClassName("delete_button")
+        for (i in deleteButtons) {
+            deleteButtons[i].onclick = deleteEntry
+        }
+
+        async function updatePlace() {
+            try {
+                    let season = 1
+                    let onlyEpisodes = (this.dataset.season == "no")
+                    if (!onlyEpisodes) {
+                        season = parseInt(prompt("Enter season:", String(this.dataset.season)))
+                    }
+                    if (parseInt(season) > 0) {
+                        let episode = parseInt(prompt("Enter episode:", String(this.dataset.episode)))
+                        if (parseInt(episode) > 0) {
+                            let response = await fetch(("{{list_id}}/update/" + season + "/" + episode), {
+                                method: "POST",
+                                body: this.dataset.entry,
+                                mode: "same-origin",
+                                headers: {'X-CSRFToken': csrftoken},
+                            })
+                            this.dataset.season = season
+                            this.dataset.episode = episode
+
+                            if (onlyEpisodes) {
+                                this.parentElement.getElementsByClassName("current_place")[0].innerText = 
+                                "Current Episode: " + episode
+                            } else {
+                                this.parentElement.getElementsByClassName("current_place")[0].innerText = 
+                                "Current Season: " + season + " | Current Episode: " + episode
+                            }
+                        }
+                    }
+                } catch(error) {
+                    console.error(error)
+            }
+        }
+
+        let updateButtons = document.getElementsByClassName("episode_button")
+        for (i in updateButtons) {
+            updateButtons[i].onclick = updatePlace
+        }
+
+        inputError = document.getElementById("input_error")
+        inputError.hidden = true
+        customEntryForm = document.getElementById("add_custom_entry")
+        customEntryForm.hidden = true
+        
+        showAutoSubmit.onclick = async function() {
+            showAutoSubmit.disabled = true
+            showAutoSubmit.value = "Looking up show info..."
+            showAutoInput.disabled = true
+            try {
+                let response = await fetch("{{list_id}}/add", {
+                    method: "POST",
+                    body: showAutoInput.value,
+                    mode: "same-origin",
+                    headers: {'X-CSRFToken': csrftoken},
+                })
+                let data = await response.json()
+                let listEntry = document.createElement("li")
+                if (document.getElementById("empty_list_notif") != null) {
+                    document.getElementById("empty_list_notif").remove()
+                }
+                listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
+                + String(data.seasons) + " | Episodes: " + String(data.episodes)))
+                let currentPlace = document.createElement("div")
+                currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
+                currentPlace.className = "current_place"
+                listEntry.appendChild(currentPlace)
+                let updateButton = document.createElement("input")
+                updateButton.type = "button"
+                updateButton.value = "Update Place"
+                updateButton.dataset.entry = data.entryID
+                updateButton.dataset.season = 1
+                updateButton.dataset.episode = 1
+                updateButton.onclick = updatePlace
+                let deleteButton = document.createElement("input")
+                deleteButton.type = "button"
+                deleteButton.value = "Delete Entry"
+                deleteButton.dataset.entry = data.entryID
+                deleteButton.onclick = deleteEntry
+                listEntry.appendChild(updateButton)
+                listEntry.appendChild(deleteButton)
+                document.getElementById("show_list").appendChild(listEntry)
+                inputError.hidden = true
+            } catch(error) {
+                console.error(error)
+                inputError.hidden = false
+            }
+            showAutoSubmit.disabled = false
+            showAutoSubmit.value = "Add to list"
+            showAutoInput.disabled = false
+            showAutoInput.value = ""
+        }
+    </script>
+</body>

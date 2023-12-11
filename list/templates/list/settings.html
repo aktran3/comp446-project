@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>User Settings</title>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <h2>User Settings</h3>
+        <p>Welcome, {{ user.username }}!</p>
+        <a href="{% url 'logout' %}">Sign Out</a>
+        <a href="/list">Your Lists</a>
+        </br>
+        </br>
+        <form action="/update_settings/" method="post">
+            {% csrf_token %}
+            <input type="text" name="country" placeholder="" value="{{current_settings.defaultcountry}}">
+            <label for="country">Default country when searching for shows. (Enter as a term, e.g. American, Dutch, etc.)</label>
+        </br>
+        </br>
+            <input type="submit" id="save_settings" value="Save Settings">
+        </form>
+    {% else %}
+        <p>Unable to display page.</p>
+        <a href="{% url 'login' %}">Please log in to view.</a>
+    {% endif %}
+</body>
