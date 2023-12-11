@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<head>
-    <meta charset="utf-8">
-    <title>Create Account</title>
-</head>
-<body>
+{% extends "list/base.html" %}
+{% block title %}Create Account{% endblock %}
+{% block content %}
     <h1>new account page</h1>
     <form id="new user" action="/new_user/create" method="post">
         {% csrf_token %}
@@ -12,4 +9,4 @@
         <input type="password" name="password_confirm" placeholder="Re-enter Password">
         <input type="submit" value="Create Account">
     </form>
-</body>
+{% endblock  %}    

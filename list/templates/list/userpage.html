@@ -1,30 +1,52 @@
-<!DOCTYPE html>
-<head>
-    <meta charset="utf-8">
-    <title>Media List</title>
-</head>
-<body>
-    {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }}!</p>
-        <a href="{% url 'logout' %}">Sign Out</a>
-        {% if user_lists %}
+{% extends "list/base.html" %}
+{% comment %} 
+    Acknowlegements: referenced Alpine.js docs
+{% endcomment %}
+{% block title %}Show Me{% endblock %}
+{% block content %}
+    <div x-data="{ open: false }">
+        {% if user.is_authenticated %}
+            <h1>Lists</h1>
+            {% if user_lists %}
+            <form id="add entry" action="/list/createnew" method="post">
+                {% csrf_token %}
+                <input type="text" name="title" placeholder="List Title">
+                <input type="submit" value="Create New List">
+            </form>
+                <ul>
+                    {% for list in user_lists %}
+                        <li>
+                            <a x-on:click="open = ! open">{{list.listname}}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You don't have any lists! Why not add one?</p>
+            {% endif %}
+        {% else %}
+            <p>Unable to display page.</p>
+            <a href="{% url 'login' %}">Please log in to view.</a>
+        {% endif %}
+        <div x-show="open" @click.outside="open = false">
+            show list details
+            {% comment %} {% if entry_list %}
             <ul>
-                {% for list in user_lists %}
-                    <li>
-                        <a href="{{list.listid}}">{{list.listname}}</a>
-                    </li>
+                {% for entry in entry_list %}
+                    <li>{{entry.title}} | Rating: {{entry.rating}}/10 | Episodes: {{entry.episodeCount}}</li>
                 {% endfor %}
             </ul>
-        {% else %}
-            <p>You don't have any lists! Why not add one?</p>
-        {% endif %}
-        <form id="add entry" action="/list/createnew" method="post">
-            {% csrf_token %}
-            <input type="text" name="title" placeholder="List Title">
-            <input type="submit" value="Create New List">
-        </form>
-    {% else %}
-        <p>Unable to display page.</p>
-        <a href="{% url 'login' %}">Please log in to view.</a>
-    {% endif %}
-</body>
+            {% else %}
+                <p>This list is empty</p>
+            {% endif %}
+            <form id="add entry" action="{{list_id}}/add" method="post">
+                {% csrf_token %}
+                <input type="text" name="title" placeholder="Show Title">
+                <label for="rating">Rating:</label>
+                <input type="number" name="rating">
+                <label for="episodeCount">Episode Count:</label>
+                <input type="number" name="episodeCount">
+                <input type="submit" value="Add Entry">
+            </form> {% endcomment %}
+        </div>
+    </div>
+{% endblock  %}    
