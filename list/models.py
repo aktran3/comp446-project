@@ -11,10 +11,15 @@ class List(models.Model):
 
 class Entry(models.Model):
     title = models.CharField(max_length=500)
-    seasonCount = models.IntegerField()
-    episodeCount = models.IntegerField()
+    isTelevision = models.BooleanField()
+    seasonCount = models.IntegerField(null=True)
+    episodeCount = models.IntegerField(null=True)
     entryid = models.IntegerField()
-    currentSeason = models.IntegerField()
-    currentEpisode = models.IntegerField()
-    onlyEpisodes = models.BooleanField()
+    currentSeason = models.IntegerField(null=True)
+    currentEpisode = models.IntegerField(null=True)
+    onlyEpisodes = models.BooleanField(null=True)
+
+    runtime = models.IntegerField(null=True)
+    releaseYear = models.IntegerField(null=True)
+
     list = models.ForeignKey(List, on_delete=models.CASCADE)

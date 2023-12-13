@@ -3,22 +3,26 @@
 {% block content %}
     {% if user.is_authenticated %}
         <h1>{{list_title}}</h1>
-        <a href="/list">Back</a>
     {% endif %}
     {% if entry_list %}
         <ul id="show_list">
             {% for entry in entry_list %}
                 <li>
-                    {% if entry.onlyEpisodes %}
-                        {{entry.title}} | Episodes: {{entry.episodeCount}}
-                        <div class="current_place">Current Episode: {{entry.currentEpisode}}</div>
-                        <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
-                        data-season="no" data-episode="{{entry.currentEpisode}}">
+                    {% if entry.isTelevision %}
+                        {% if entry.onlyEpisodes %}
+                            {{entry.title}} | Episodes: {{entry.episodeCount}}
+                            <div class="current_place">Current Episode: {{entry.currentEpisode}}</div>
+                            <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
+                            data-season="no" data-episode="{{entry.currentEpisode}}">
+                        {% else %}
+                            {{entry.title}} | Seasons: {{entry.seasonCount}} | Episodes: {{entry.episodeCount}}
+                            <div class="current_place">Current Season: {{entry.currentSeason}} | Current Episode: {{entry.currentEpisode}}</div>
+                            <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
+                            data-season="{{entry.currentSeason}}" data-episode="{{entry.currentEpisode}}">
+                        {% endif %}
                     {% else %}
-                        {{entry.title}} | Seasons: {{entry.seasonCount}} | Episodes: {{entry.episodeCount}}
-                        <div class="current_place">Current Season: {{entry.currentSeason}} | Current Episode: {{entry.currentEpisode}}</div>
-                        <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
-                        data-season="{{entry.currentSeason}}" data-episode="{{entry.currentEpisode}}">
+                        {{entry.title}} | Running Time: {{entry.runtime}} Minutes | Release Year: {{entry.releaseYear}}
+                        </br>
                     {% endif %}
                     <input type="button" class="delete_button" value="Delete Entry" data-entry="{{entry.entryid}}">
                 </li>
@@ -30,14 +34,21 @@
         </ul>
     {% endif %}
     <div id="add_auto_entry">
-        <input type="text" id="show_name_auto" name="show_name_auto" placeholder="Enter the name of a show...">
+        <input type="text" id="show_name_auto" name="show_name_auto" placeholder="Enter media title...">
         <input type="button" id="add_show_auto" name="add_show_auto" value="Add to list">
-        <p id="input_error">Error finding show. Make sure the title is spelled and capitialized correctly.</p>
+        <label for="mediaType">What type of media?</label>
+        <select id="mediaType" name="mediaType">
+            <option value="show">TV Show</option>
+            <option value="movie">Movie</option>
+        </select>
+        <p id="input_error">Error finding media. Make sure the title is spelled and capitialized correctly, and that you've selected
+            the correct type of media.
+        </p>
     </div>
     <form id="add_custom_entry" action="{{list_id}}/add_custom" method="post">
         {% csrf_token %}
         <input type="text" name="title" placeholder="Show Title">
-        <label for="seasons">Season Count:</label>
+        <label for="seasonCount">Season Count:</label>
         <input type="number" name="seasonCount">
         <label for="episodeCount">Episode Count:</label>
         <input type="number" name="episodeCount">
@@ -105,13 +116,13 @@
                                 mode: "same-origin",
                                 headers: {'X-CSRFToken': csrftoken},
                             })
-                            this.dataset.season = season
                             this.dataset.episode = episode
 
                             if (onlyEpisodes) {
                                 this.parentElement.getElementsByClassName("current_place")[0].innerText = 
                                 "Current Episode: " + episode
                             } else {
+                                this.dataset.season = season
                                 this.parentElement.getElementsByClassName("current_place")[0].innerText = 
                                 "Current Season: " + season + " | Current Episode: " + episode
                             }
@@ -136,37 +147,58 @@
             showAutoSubmit.disabled = true
             showAutoSubmit.value = "Looking up show info..."
             showAutoInput.disabled = true
+            console.log(document.getElementById("mediaType").value)
+            let data = null;
+            let listEntry = null;
             try {
-                let response = await fetch("{{list_id}}/add", {
-                    method: "POST",
-                    body: showAutoInput.value,
-                    mode: "same-origin",
-                    headers: {'X-CSRFToken': csrftoken},
-                })
-                let data = await response.json()
-                let listEntry = document.createElement("li")
-                if (document.getElementById("empty_list_notif") != null) {
-                    document.getElementById("empty_list_notif").remove()
+                if (document.getElementById("mediaType").value == "show") {
+                    let response = await fetch("{{list_id}}/add/tv", {
+                        method: "POST",
+                        body: showAutoInput.value,
+                        mode: "same-origin",
+                        headers: {'X-CSRFToken': csrftoken},
+                    })
+                    data = await response.json()
+                    listEntry = document.createElement("li")
+                    if (document.getElementById("empty_list_notif") != null) {
+                        document.getElementById("empty_list_notif").remove()
+                    }
+                    listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
+                    + String(data.seasons) + " | Episodes: " + String(data.episodes)))
+                    let currentPlace = document.createElement("div")
+                    currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
+                    currentPlace.className = "current_place"
+                    listEntry.appendChild(currentPlace)
+                    let updateButton = document.createElement("input")
+                    updateButton.type = "button"
+                    updateButton.value = "Update Place"
+                    updateButton.dataset.entry = data.entryID
+                    updateButton.dataset.season = 1
+                    updateButton.dataset.episode = 1
+                    updateButton.onclick = updatePlace
+                    listEntry.appendChild(updateButton) 
+                } else {
+                    let response = await fetch("{{list_id}}/add/movie", {
+                        method: "POST",
+                        body: showAutoInput.value,
+                        mode: "same-origin",
+                        headers: {'X-CSRFToken': csrftoken},
+                    })
+                    data = await response.json()
+                    listEntry = document.createElement("li")
+                    if (document.getElementById("empty_list_notif") != null) {
+                        document.getElementById("empty_list_notif").remove()
+                    }
+                    listEntry.appendChild(document.createTextNode(data.title + " | Running Time: " 
+                    + String(data.runtime) + " Minutes | Release Year: " + String(data.releaseYear)))
+                    listEntry.appendChild(document.createElement("br"))
                 }
-                listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
-                + String(data.seasons) + " | Episodes: " + String(data.episodes)))
-                let currentPlace = document.createElement("div")
-                currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
-                currentPlace.className = "current_place"
-                listEntry.appendChild(currentPlace)
-                let updateButton = document.createElement("input")
-                updateButton.type = "button"
-                updateButton.value = "Update Place"
-                updateButton.dataset.entry = data.entryID
-                updateButton.dataset.season = 1
-                updateButton.dataset.episode = 1
-                updateButton.onclick = updatePlace
                 let deleteButton = document.createElement("input")
                 deleteButton.type = "button"
                 deleteButton.value = "Delete Entry"
                 deleteButton.dataset.entry = data.entryID
                 deleteButton.onclick = deleteEntry
-                listEntry.appendChild(updateButton)
+                
                 listEntry.appendChild(deleteButton)
                 document.getElementById("show_list").appendChild(listEntry)
                 inputError.hidden = true
@@ -181,3 +213,4 @@
         }
     </script>
 </body>
+{% endblock content %}

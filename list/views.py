@@ -12,7 +12,7 @@ import types
 # Referenced wikimedia REST api docs and user-agent policy.
 # Referenced python requests module docs, and the python docs
 
-headers = {'UPDATE WITH USER AGENT'}
+headers = {'User-Agent': 'List-Project/1.0 (ghoffma1@macalester.edu)'}
 # This sets up the user agent, which is required for wikimedia apis.
 # The wikipedia REST API is licensed under https://creativecommons.org/licenses/by-sa/4.0/deed.en
 
@@ -77,7 +77,7 @@ def add_custom_entry(request, id):
     newEntry.save()
     return HttpResponseRedirect('/list/' + str(id))
 
-def add_entry(request, id):
+def add_tv(request, id):
     defaultcountry = Settings.objects.get(userid=request.user.id).defaultcountry
 
     requestTitle = str(request.body).removeprefix("b'").removeprefix('b"').removesuffix("'").removesuffix('"')
@@ -111,8 +111,7 @@ def add_entry(request, id):
     foundEpisodes = int(foundEpisodes)
 
     foundSeasons = re.search("\"(num_series|num_seasons)\":\{\"wt\":\"(\d)+", str(requestHTML)).group()
-    foundSeasons = foundSeasons.replace("\"num_series\":{\"wt\":\"", "")
-    foundSeasons = foundSeasons.replace("\"num_seasons\":{\"wt\":\"", "")
+    foundSeasons = foundSeasons.replace("\"num_series\":{\"wt\":\"", "").replace("\"num_seasons\":{\"wt\":\"", "")
     foundSeasons = int(foundSeasons)
 
     newEntryID = Entry.objects.all().aggregate(Max('entryid')).get('entryid__max')
@@ -120,11 +119,63 @@ def add_entry(request, id):
         newEntryID = 1
     else:
         newEntryID = newEntryID + 1
-    newEntry = Entry(title=foundTitle, seasonCount=foundSeasons, episodeCount=foundEpisodes, 
+    newEntry = Entry(title=foundTitle, seasonCount=foundSeasons, episodeCount=foundEpisodes, isTelevision=True, 
     list=List.objects.get(listid=id), entryid=newEntryID, currentEpisode=1, currentSeason=1, onlyEpisodes=False)
     newEntry.save()
     return JsonResponse({"title": foundTitle, "episodes": foundEpisodes, "seasons": foundSeasons, "entryID": newEntryID})
     # return JsonResponse({"title": "what", "episodes": 2, "seasons": 1})
+
+def add_movie(request, id):
+    defaultcountry = Settings.objects.get(userid=request.user.id).defaultcountry
+
+    requestTitle = str(request.body).removeprefix("b'").removeprefix('b"').removesuffix("'").removesuffix('"')
+    requestTitle = requestTitle.replace(':','%3A').replace('(','%28').replace(')','%29').replace('?','%3F').replace('!','%21').replace(" ", "_")
+    # percent-encoding
+    requestURL = "https://en.wikipedia.org/api/rest_v1/page/html/" + requestTitle
+    requestHTML = requests.get(requestURL, headers=headers).text
+    
+    foundTitle = re.search("<title>&lt;i>(.*?)&lt;", str(requestHTML))
+    foundRuntime = re.search("\"runtime\":\{\"wt\":\"(\d)+", str(requestHTML))
+    if foundTitle == None or foundRuntime == None:
+        # this first block of code accounts for shows that share names with other articles
+        requestURL = "https://en.wikipedia.org/api/rest_v1/page/html/" + requestTitle + "_%28film%29"
+        requestHTML = requests.get(requestURL, headers=headers).text
+        foundTitle = re.search("<title>&lt;i>(.*?)&lt;", str(requestHTML))  
+        if foundTitle == None or re.search("<title>&lt;i>(.*?)&lt;/i> \(franchise\)", str(requestHTML)) != None:
+            # this second block of code searches for shows under the user's default country parameter
+            # this is useful for shows that have multiple versions across different countries with the same title
+            requestURL = "https://en.wikipedia.org/api/rest_v1/page/html/" + requestTitle + "_%28" + defaultcountry +"_film%29"
+            requestHTML = requests.get(requestURL, headers=headers).text
+            foundTitle = re.search("<title>&lt;i>(.*?)&lt;", str(requestHTML)).group()
+        else:
+            foundTitle = foundTitle.group()
+    else:
+        foundTitle = foundTitle.group()
+    foundTitle = foundTitle.replace("<title>&lt;i>", "")
+    foundTitle = foundTitle.replace("&lt;", "")
+
+    foundRuntime = foundRuntime = re.search("\"runtime\":{\"wt\":\"(\d)+", str(requestHTML)).group()
+    print(foundRuntime)
+    print("RUNTIME ABOVE")
+    foundRuntime = foundRuntime.replace("\"runtime\":{\"wt\":\"", "")
+    print(foundRuntime)
+    print("RUNTIME ABOVE AGAIN")
+    foundRuntime = int(foundRuntime)
+
+    foundReleaseYear = re.search("\"released\":\{\"wt\":\"\{\{Film date\|(\d)+", str(requestHTML)).group()
+    print(foundReleaseYear)
+    foundReleaseYear = foundReleaseYear.replace("\"released\":{\"wt\":\"{{Film date|", "")
+    foundReleaseYear = int(foundReleaseYear)
+
+    newEntryID = Entry.objects.all().aggregate(Max('entryid')).get('entryid__max')
+    if (newEntryID == None):
+        newEntryID = 1
+    else:
+        newEntryID = newEntryID + 1
+    newEntry = Entry(title=foundTitle, runtime=foundRuntime, releaseYear=foundReleaseYear, isTelevision=False,
+    list=List.objects.get(listid=id), entryid=newEntryID, currentEpisode=1, currentSeason=1, onlyEpisodes=False)
+    newEntry.save()
+    return JsonResponse({"title": foundTitle, "runtime": foundRuntime, "releaseYear": foundReleaseYear, "entryID": newEntryID})
 
 def delete_entry(request, id):
     Entry.objects.get(entryid=int(str(request.body).removeprefix("b'").removesuffix("'"))).delete()

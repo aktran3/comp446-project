@@ -2,7 +2,7 @@
 {% block title %}Show Me{% endblock %}
 {% block content %}
     {% if user.is_authenticated %}
-        <h2>User Settings</h3>
+        <h1>User Settings</h1>
         <form action="/update_settings/" method="post">
             {% csrf_token %}
             <input type="text" name="country" placeholder="" value="{{current_settings.defaultcountry}}">

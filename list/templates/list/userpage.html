@@ -17,7 +17,7 @@
                     {% for list in user_lists %}
                         <li>
                             <!-- <a x-on:click="open = ! open">{{list.listname}}</a> -->
-                            <a href="list/{{list.listid}}">{{list.listname}}</a>
+                            <a href="{{list.listid}}">{{list.listname}}</a>
                         </li>
                     {% endfor %}
                 </ul>
