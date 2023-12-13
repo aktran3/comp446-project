@@ -155,15 +155,10 @@ def add_movie(request, id):
     foundTitle = foundTitle.replace("&lt;", "")
 
     foundRuntime = foundRuntime = re.search("\"runtime\":{\"wt\":\"(\d)+", str(requestHTML)).group()
-    print(foundRuntime)
-    print("RUNTIME ABOVE")
     foundRuntime = foundRuntime.replace("\"runtime\":{\"wt\":\"", "")
-    print(foundRuntime)
-    print("RUNTIME ABOVE AGAIN")
     foundRuntime = int(foundRuntime)
 
     foundReleaseYear = re.search("\"released\":\{\"wt\":\"\{\{Film date\|(\d)+", str(requestHTML)).group()
-    print(foundReleaseYear)
     foundReleaseYear = foundReleaseYear.replace("\"released\":{\"wt\":\"{{Film date|", "")
     foundReleaseYear = int(foundReleaseYear)
 
