@@ -53,18 +53,17 @@
 </br>
 <input type="button" id="entry_mode_button" value="Switch to manual show entry">
 {% csrf_token %}
-{% comment %} script section breaks after joining pages, unsure why {% endcomment %}
-{% comment %} <script>
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+<script>
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
 
-    let autoEntryMode = true
+    var autoEntryMode = true
     
-    let showAutoInput = document.getElementById("show_name_auto")
-    let showAutoSubmit = document.getElementById("add_show_auto")
+    var showAutoInput = document.getElementById("show_name_auto")
+    var showAutoSubmit = document.getElementById("add_show_auto")
 
-    let customEntryForm = document.getElementById("add_custom_entry")
+    var customEntryForm = document.getElementById("add_custom_entry")
     customEntryForm.hidden = true
-    let autoEntryForm = document.getElementById("add_auto_entry")
+    var autoEntryForm = document.getElementById("add_auto_entry")
 
     document.getElementById("entry_mode_button").onclick = function() {
         autoEntryMode = !autoEntryMode
@@ -82,7 +81,7 @@
 
     async function deleteEntry() {
             this.parentElement.remove()
-            let response = await fetch("{{list_id}}/delete", {
+            var response = await fetch("{{list_id}}/delete", {
                 method: "POST",
                 body: this.dataset.entry,
                 mode: "same-origin",
@@ -90,22 +89,22 @@
             })
         }
     
-    let deleteButtons = document.getElementsByClassName("delete_button")
+    var deleteButtons = document.getElementsByClassName("delete_button")
     for (i in deleteButtons) {
         deleteButtons[i].onclick = deleteEntry
     }
 
     async function updatePlace() {
         try {
-                let season = 1
-                let onlyEpisodes = (this.dataset.season == "no")
+                var season = 1
+                var onlyEpisodes = (this.dataset.season == "no")
                 if (!onlyEpisodes) {
                     season = parseInt(prompt("Enter season:", String(this.dataset.season)))
                 }
                 if (parseInt(season) > 0) {
-                    let episode = parseInt(prompt("Enter episode:", String(this.dataset.episode)))
+                    var episode = parseInt(prompt("Enter episode:", String(this.dataset.episode)))
                     if (parseInt(episode) > 0) {
-                        let response = await fetch(("{{list_id}}/update/" + season + "/" + episode), {
+                        var response = await fetch(("{{list_id}}/update/" + season + "/" + episode), {
                             method: "POST",
                             body: this.dataset.entry,
                             mode: "same-origin",
@@ -128,7 +127,7 @@
         }
     }
 
-    let updateButtons = document.getElementsByClassName("episode_button")
+    var updateButtons = document.getElementsByClassName("episode_button")
     for (i in updateButtons) {
         updateButtons[i].onclick = updatePlace
     }
@@ -143,11 +142,11 @@
         showAutoSubmit.value = "Looking up show info..."
         showAutoInput.disabled = true
         console.log(document.getElementById("mediaType").value)
-        let data = null;
-        let listEntry = null;
+        var data = null;
+        var listEntry = null;
         try {
             if (document.getElementById("mediaType").value == "show") {
-                let response = await fetch("{{list_id}}/add/tv", {
+                var response = await fetch("{{list_id}}/add/tv", {
                     method: "POST",
                     body: showAutoInput.value,
                     mode: "same-origin",
@@ -160,11 +159,11 @@
                 }
                 listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
                 + String(data.seasons) + " | Episodes: " + String(data.episodes)))
-                let currentPlace = document.createElement("div")
+                var currentPlace = document.createElement("div")
                 currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
                 currentPlace.className = "current_place"
                 listEntry.appendChild(currentPlace)
-                let updateButton = document.createElement("input")
+                var updateButton = document.createElement("input")
                 updateButton.type = "button"
                 updateButton.value = "Update Place"
                 updateButton.dataset.entry = data.entryID
@@ -173,7 +172,7 @@
                 updateButton.onclick = updatePlace
                 listEntry.appendChild(updateButton) 
             } else {
-                let response = await fetch("{{list_id}}/add/movie", {
+                var response = await fetch("{{list_id}}/add/movie", {
                     method: "POST",
                     body: showAutoInput.value,
                     mode: "same-origin",
@@ -188,7 +187,7 @@
                 + String(data.runtime) + " Minutes | Release Year: " + String(data.releaseYear)))
                 listEntry.appendChild(document.createElement("br"))
             }
-            let deleteButton = document.createElement("input")
+            var deleteButton = document.createElement("input")
             deleteButton.type = "button"
             deleteButton.value = "Delete Entry"
             deleteButton.dataset.entry = data.entryID
@@ -206,4 +205,4 @@
         showAutoInput.disabled = false
         showAutoInput.value = ""
     }
-</script>  {% endcomment %}
+</script> 
