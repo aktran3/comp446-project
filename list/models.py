@@ -11,7 +11,7 @@ class List(models.Model):
 
 class Entry(models.Model):
     title = models.CharField(max_length=500)
-    isTelevision = models.BooleanField()
+    isTelevision = models.BooleanField(null=True)
     seasonCount = models.IntegerField(null=True)
     episodeCount = models.IntegerField(null=True)
     entryid = models.IntegerField()

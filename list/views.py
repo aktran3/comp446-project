@@ -12,7 +12,7 @@ import types
 # Referenced wikimedia REST api docs and user-agent policy.
 # Referenced python requests module docs, and the python docs
 
-headers = {'User-Agent': 'List-Project/1.0 (ghoffma1@macalester.edu)'}
+headers = {'User-Agent': 'List-Project/1.0 (ktran3@macalester.edu)'}
 # This sets up the user agent, which is required for wikimedia apis.
 # The wikipedia REST API is licensed under https://creativecommons.org/licenses/by-sa/4.0/deed.en
 
