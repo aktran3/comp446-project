@@ -1,5 +1,9 @@
+/* 
+    Referenced https://stackoverflow.com/questions/17042201/how-to-style-input-and-submit-button-with-css for styling input buttons
+*/
 * {
     font-family: 'Dosis', sans-serif;
+    font-size: large;
 }
 
 /* Nav Styles */
@@ -12,7 +16,7 @@ nav ul {
     padding: 5px;
     overflow: hidden;
     background-color: rgb(180, 255, 180);
-    font-size: large;
+    font-weight: bolder;
   }
   
 nav ul li, 
@@ -22,6 +26,10 @@ nav ul li a {
     text-decoration: none;
     padding: 0px 8px;
     float: left;
+}
+
+nav ul li a {
+    color: #f79d84;
 }
 
 nav .main-nav {
@@ -35,8 +43,35 @@ body{
     margin: auto;
 }
 
-#container{
+h1{
+    font-size: xx-large;
+}
+
+h2{
+    font-size: x-large;
+}
+
+input[type=button],
+input[type=submit]{
+    border-radius: 15px;
+    background-color: #a7c6da;
+}
+
+ul li{
+    list-style-type: none;
+}
+
+#content{
+    margin: 0 4em;
+}
+
+#list-container{
     display: grid;
     grid-template-columns: 1fr 2fr;
 }
 
+iframe{
+    width: 90%;
+    height: 500px;
+    margin: 10px;
+}

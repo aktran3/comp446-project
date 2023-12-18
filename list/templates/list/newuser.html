@@ -1,15 +1,16 @@
 {% extends "list/base.html" %}
 {% block title %}Create Account{% endblock %}
 {% block content %}
-    <h1>new account page</h1>
+    <h1>Create Your Account</h1>
     <form id="new user" action="/new_user/create" method="post">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username">
         <input type="password" name="password" placeholder="Password">
         <input type="password" name="password_confirm" placeholder="Re-enter Password">
-        <input type="submit" value="Create Account">
         <h4>User Settings:</h4>
+        <label for="country">Enter the default country to use when searching for shows. (Enter as a term, e.g. American, Dutch, etc.)</label><p>
         <input type="text" name="country" placeholder="">
-        <label for="country">Default country when searching for shows. (Enter as a term, e.g. American, Dutch, etc.)</label>
+        <p>
+        <input type="submit" value="Create Account">
     </form>
 {% endblock  %}    

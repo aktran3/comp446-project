@@ -1,3 +1,7 @@
+{% comment %} 
+    Referenced w3schools page on iframe
+{% endcomment %}
+<h2>{{list_title}}</h2>
 {% if entry_list %}
     <ul id="show_list">
         {% for entry in entry_list %}
@@ -29,13 +33,13 @@
 {% endif %}
 <div id="add_auto_entry">
     <input type="text" id="show_name_auto" name="show_name_auto" placeholder="Enter media title...">
-    <input type="button" id="add_show_auto" name="add_show_auto" value="Add to list">
     <label for="mediaType">What type of media?</label>
     <select id="mediaType" name="mediaType">
         <option value="show">TV Show</option>
         <option value="movie">Movie</option>
     </select>
-    <p id="input_error">Error finding media. Make sure the title is spelled and capitialized correctly, and that you've selected
+    <input type="button" id="add_show_auto" name="add_show_auto" value="Add to list">
+    <p id="input_error">Error finding media. Make sure the title is spelled and capitalized correctly, and that you've selected
         the correct type of media.
     </p>
 </div>
@@ -48,6 +52,8 @@
     <input type="number" name="episodeCount">
     <input type="checkbox" name="onlyEpisodes">
     <label for="episodeCount">Don't Count Seasons</label>
+    <iframe src="https://en.wikipedia.org/wiki/Main_Page" title="Wikipedia"></iframe>
+    </br>
     <input type="submit" id="add_show_custom" value="Add to List">
 </form>
 </br>
