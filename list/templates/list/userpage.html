@@ -6,7 +6,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 <h1>Lists</h1>
-<div id="container" x-data="{ open: false }">
+<div id="list-container" x-data="{ open: false }">
     <div id="list">
     {% if user_lists %}
         <form id="add entry" action="/list/createnew" method="post">
@@ -17,10 +17,9 @@
             <ul>
                 {% for list in user_lists %}
                     <li>
-                        <div hx-get="{{list.listid}}" hx-target="#entry-list">
-                            <a x-on:click="open = ! open">{{list.listname}}</a> </t>
+                        <div hx-get="{{list.listid}}" hx-target="#entry-list" x-on:click="open = ! open">
+                            {{list.listname}}
                         </div>
-                        <a href="{{list.listid}}">{{list.listname}}</a>
                     </li>
                 {% endfor %}
             </ul>

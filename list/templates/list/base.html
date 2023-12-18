@@ -9,16 +9,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
-        <link rel="stylesheet" type="text/css" href="{% static 'list/style.css' %}">        
+        <link rel="stylesheet" type="text/css" href="{% static 'list/style.css' %}"> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis">     
     </head>
     <body>
         <nav>
             <ul>
-                <li>LOGO</li>
-                <li><a href="{% url 'homepage' %}">About</a></li>
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'index' %}">My Lists</a></li>
-                {% endif %}
+                <div class="main-nav">
+                <li><img src="{% static 'logo.png' %}", alt="logo" width="75px"></li>
+                    <li><a href="{% url 'homepage' %}">About</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'index' %}">My Lists</a></li>
+                    {% endif %}
+                </div>
                 <div class="user-auth">
                     {% if user.is_authenticated %}
                         <li>Welcome, {{ user.username }}!</li>

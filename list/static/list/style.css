@@ -1,10 +1,18 @@
+* {
+    font-family: 'Dosis', sans-serif;
+}
+
 /* Nav Styles */
 nav ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     list-style-type: none;
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 5px;
     overflow: hidden;
     background-color: rgb(180, 255, 180);
+    font-size: large;
   }
   
 nav ul li, 
@@ -16,15 +24,19 @@ nav ul li a {
     float: left;
 }
 
-nav .user-auth{
-    float: right;
+nav .main-nav {
+    display: flex;
+    align-items: center;
 }
 
+/* Content Styles */
 body{
     background-color: rgb(230, 240, 228);
+    margin: auto;
 }
 
 #container{
     display: grid;
     grid-template-columns: 1fr 2fr;
 }
+
