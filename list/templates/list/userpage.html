@@ -1,35 +1,45 @@
 {% extends "list/base.html" %}
 {% comment %} 
-    Acknowlegements: referenced Alpine.js docs
+    Acknowlegements: referenced Alpine.js and htmx docs
 {% endcomment %}
 {% block title %}Show Me{% endblock %}
 {% block content %}
-    <div x-data="{ open: false }">
-        {% if user.is_authenticated %}
-            <h1>Lists</h1>
-            {% if user_lists %}
-            <form id="add entry" action="/list/createnew" method="post">
-                {% csrf_token %}
-                <input type="text" name="title" placeholder="List Title">
-                <input type="submit" value="Create New List">
-            </form>
-                <ul>
-                    {% for list in user_lists %}
-                        <li>
-                            <!-- <a x-on:click="open = ! open">{{list.listname}}</a> -->
-                            <a href="{{list.listid}}">{{list.listname}}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+{% if user.is_authenticated %}
+<h1>Lists</h1>
+<div id="container" x-data="{ open: false }">
+        <div id="list">
+        {% if user_lists %}
+                <form id="add entry" action="/list/createnew" method="post">
+                {% comment %} <form hx-post="{% url "create_list" %}" hx-target='#entry-list' > {% endcomment %}
+                    {% csrf_token %}
+                    <input type="text" name="title" placeholder="List Title">
+                    <input type="submit" value="Create New List">
+                </form>
+                    <ul>
+                        {% for list in user_lists %}
+                            <li>
+                                <div hx-get="{{list.listid}}" hx-target="#entry-list">
+                                    <a x-on:click="open = ! open">{{list.listname}}</a> </t>
+                                </div>
+                                <a href="{{list.listid}}">{{list.listname}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>You don't have any lists! Why not add one?</p>
+                    <form id="add entry" action="/list/createnew" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="title" placeholder="List Title">
+                        <input type="submit" value="Create New List">
+                    </form>
+                {% endif %}
             {% else %}
-                <p>You don't have any lists! Why not add one?</p>
+                <p>Unable to display page.</p>
+                <a href="{% url 'login' %}">Please log in to view.</a>
             {% endif %}
-        {% else %}
-            <p>Unable to display page.</p>
-            <a href="{% url 'login' %}">Please log in to view.</a>
-        {% endif %}
-        <div x-show="open" @click.outside="open = false">
-            show list details
+        </div>
+        <div id="entry-list" x-show="open">
+            {% include "partials/list.html" %}
         </div>
     </div>
 {% endblock  %}    

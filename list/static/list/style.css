@@ -24,6 +24,7 @@ body{
     background-color: rgb(230, 240, 228);
 }
 
-aside{
-    background-color: cornflowerblue;
+#container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }

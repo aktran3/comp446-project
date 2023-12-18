@@ -8,19 +8,22 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
         <link rel="stylesheet" type="text/css" href="{% static 'list/style.css' %}">        
     </head>
     <body>
         <nav>
-            {% comment %} <img src="", alt="logo" width="50px"> {% endcomment %}
             <ul>
                 <li>LOGO</li>
                 <li><a href="{% url 'homepage' %}">About</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'index' %}">My Lists</a></li>
+                {% endif %}
                 <div class="user-auth">
                     {% if user.is_authenticated %}
                         <li>Welcome, {{ user.username }}!</li>
-                        <li><a href="{% url 'logout' %}">Sign Out</a></li>
                         <li><a href="/settings">User Settings</a></li>
+                        <li><a href="{% url 'logout' %}">Sign Out</a></li>
                     {% else %}
                         <li><a href="{% url 'login' %}">login</a></li>
                         <li><a href="{% url 'new_user' %}">new account</a></li>
@@ -29,6 +32,5 @@
             </ul>
         </nav>
         {% block content %}{% endblock  %}
-        <script src="" async defer></script>
     </body>
 </html>
