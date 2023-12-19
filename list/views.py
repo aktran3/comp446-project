@@ -128,7 +128,6 @@ def add_tv(request, id):
     list=List.objects.get(listid=id), entryid=newEntryID, currentEpisode=1, currentSeason=1, onlyEpisodes=False)
     newEntry.save()
     return JsonResponse({"title": foundTitle, "episodes": foundEpisodes, "seasons": foundSeasons, "entryID": newEntryID})
-    # return JsonResponse({"title": "what", "episodes": 2, "seasons": 1})
 
 def add_movie(request, id):
     defaultcountry = Settings.objects.get(userid=request.user.id).defaultcountry
@@ -148,7 +147,7 @@ def add_movie(request, id):
         foundTitle = re.search("<title>&lt;i>(.*?)&lt;", str(requestHTML))  
         if foundTitle == None or re.search("<title>&lt;i>(.*?)&lt;/i> \(franchise\)", str(requestHTML)) != None:
             # this second block of code searches for shows under the user's default country parameter
-            # this is useful for shows that have multiple versions across different countries with the same title
+            # this is useful for movies that have multiple versions across different countries with the same title
             requestURL = "https://en.wikipedia.org/api/rest_v1/page/html/" + requestTitle + "_%28" + defaultcountry +"_film%29"
             requestHTML = requests.get(requestURL, headers=headers).text
             foundTitle = re.search("<title>&lt;i>(.*?)&lt;", str(requestHTML)).group()
@@ -194,11 +193,11 @@ def create_user(request):
             user.save()
             userSettings = Settings(userid = user.id, defaultcountry = values['country'].capitalize())
             userSettings.save()
-            return HttpResponseRedirect('/list/')
+            return HttpResponseRedirect('/')
         else:
             return HttpResponseRedirect('/new_user/')
     else:
-        return render(request, 'list/homepage.html')
+        return HttpResponseRedirect('/')
 
 def settings(request):
     if(request.user.is_authenticated):

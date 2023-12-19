@@ -172,10 +172,12 @@
     customEntryForm = document.getElementById("add_custom_entry")
     customEntryForm.hidden = true
 
+    // Function responsible for adding custom show/movie entries
     document.getElementById("add_show_custom").onclick = async function() {
         var data = null;
         var listEntry = null;
         var customEntryData = new FormData()
+        // holds data used to create the new entry
         customEntryData.append("mediaType", document.getElementById("media_type_manual").value)
         customEntryData.append("title", document.getElementById("custom_title").value)
         customEntryData.append("seasonCount", document.getElementById("custom_season_count").value)
@@ -192,14 +194,22 @@
             })
             data = await response.json()
             if (data.format == "show") {
+                // create list entry for a tv show
                 listEntry = document.createElement("li")
                 if (document.getElementById("empty_list_notif") != null) {
                     document.getElementById("empty_list_notif").remove()
                 }
-                listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
-                + String(data.seasons) + " | Episodes: " + String(data.episodes)))
-                var currentPlace = document.createElement("div")
-                currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
+                if (data.onlyEpisodes){
+                    listEntry.appendChild(document.createTextNode(data.title + " | Episodes: " + String(data.episodes)))
+                    var currentPlace = document.createElement("div")
+                    currentPlace.innerText = "Current Episode: 1"
+                } else {
+                    listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
+                    + String(data.seasons) + " | Episodes: " + String(data.episodes)))
+                    var currentPlace = document.createElement("div")
+                    currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
+                }
+                
                 currentPlace.className = "current_place"
                 listEntry.appendChild(currentPlace)
                 var updateButton = document.createElement("input")
@@ -211,6 +221,7 @@
                 updateButton.onclick = updatePlace
                 listEntry.appendChild(updateButton) 
             } else {
+                // create list entry for a movie
                 listEntry = document.createElement("li")
                 if (document.getElementById("empty_list_notif") != null) {
                     document.getElementById("empty_list_notif").remove()
@@ -219,6 +230,7 @@
                 + String(data.runtime) + " Minutes | Release Year: " + String(data.releaseYear)))
                 listEntry.appendChild(document.createElement("br"))
             }
+            // add delete button to entry
             var deleteButton = document.createElement("input")
             deleteButton.type = "button"
             deleteButton.value = "Delete Entry"
@@ -228,6 +240,7 @@
             listEntry.appendChild(deleteButton)
             document.getElementById("show_list").appendChild(listEntry)
             inputError.hidden = true
+            // clear the form values for the custom entry form
             document.getElementById("custom_title").value = null
             document.getElementById("custom_season_count").value = null
             document.getElementById("custom_episode_count").value = null
