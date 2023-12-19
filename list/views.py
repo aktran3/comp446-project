@@ -73,11 +73,14 @@ def add_custom_entry(request, id):
         newEntry = Entry(title=values['title'], seasonCount=customSeasonCount, episodeCount=int(values['episodeCount']),
         list=List.objects.get(listid=id), entryid=newEntryID, currentEpisode=1, currentSeason=1, onlyEpisodes=justEpisodes, isTelevision=True)
         newEntry.save()
+        return JsonResponse({"title": values['title'], "episodes": int(values['episodeCount']), "seasons": customSeasonCount, 
+        "entryID": newEntryID, "onlyEpisodes": justEpisodes, "format": values["mediaType"]})
     else:
         newEntry = Entry(title=values['title'], releaseYear=int(values['releaseYearForm']), runtime=int(values['runningTimeForm']),
         list=List.objects.get(listid=id), entryid=newEntryID, isTelevision=False)
         newEntry.save()
-    return HttpResponseRedirect('/list/')
+        return JsonResponse({"title": values['title'], "runtime": int(values['runningTimeForm']), 
+        "releaseYear": int(values['releaseYearForm']), "entryID": newEntryID, "format": values["mediaType"]})
     
 
 def add_tv(request, id):

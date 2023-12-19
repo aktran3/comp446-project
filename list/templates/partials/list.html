@@ -43,30 +43,32 @@
         the correct type of media.
     </p>
 </div>
-<form id="add_custom_entry" action="{{list_id}}/add_custom" method="post">
+<form id="add_custom_entry">
     {% csrf_token %}
     <select id="media_type_manual" name="mediaType">
         <option value="show">TV Show</option>
         <option value="movie">Movie</option>
     </select>
-    <input type="text" name="title" placeholder="Title">
+    <input id = "custom_title" type="text" name="title" placeholder="Title">
     <div id="manual_show_form" aria-roledescription="a divider that holds the input fields for manually adding tv shows">
         <label for="seasonCount">Season Count:</label>
-        <input type="number" name="seasonCount">
+        <input id="custom_season_count" type="number" name="seasonCount">
         <label for="episodeCount">Episode Count:</label>
-        <input type="number" name="episodeCount">
+        <input id="custom_episode_count" type="number" name="episodeCount">
         <label for="onlyEpisodes">Don't Count Seasons</label>
-        <input type="checkbox" name="onlyEpisodes">
+        <input id="only_episodes" type="checkbox" name="onlyEpisodes">
     </div>
     <div id="manual_movie_form" aria-roledescription="a divider that holds the input fields for manually adding movies">
         <label for="runningTimeForm">Running Time (Minutes):</label>
-        <input type="number" name="runningTimeForm">
+        <input id="custom_runtime" type="number" name="runningTimeForm">
         <label for="releaseYearForm">Release Year:</label>
-        <input type="number" name="releaseYearForm">
+        <input id="custom_release_year" type="number" name="releaseYearForm">
     </div>
-    <iframe src="https://en.wikipedia.org/wiki/Main_Page" title="Wikipedia"></iframe>
+    <input type="button" id="add_show_custom" value="Add to List">
     </br>
-    <input type="submit" id="add_show_custom" value="Add to List">
+    <iframe src="https://en.wikipedia.org/wiki/Main_Page" title="Wikipedia"></iframe>
+    
+    
 </form>
 </br>
 <input type="button" id="entry_mode_button" value="Switch to manual show/movie entry">
@@ -169,6 +171,74 @@
     inputError.hidden = true
     customEntryForm = document.getElementById("add_custom_entry")
     customEntryForm.hidden = true
+
+    document.getElementById("add_show_custom").onclick = async function() {
+        var data = null;
+        var listEntry = null;
+        var customEntryData = new FormData()
+        customEntryData.append("mediaType", document.getElementById("media_type_manual").value)
+        customEntryData.append("title", document.getElementById("custom_title").value)
+        customEntryData.append("seasonCount", document.getElementById("custom_season_count").value)
+        customEntryData.append("episodeCount", document.getElementById("custom_episode_count").value)
+        customEntryData.append("onlyEpisodes", document.getElementById("only_episodes").value)
+        customEntryData.append("runningTimeForm", document.getElementById("custom_runtime").value)
+        customEntryData.append("releaseYearForm", document.getElementById("custom_release_year").value)
+        try {
+            var response = await fetch("{{list_id}}/add_custom", {
+                method: "POST",
+                body: customEntryData,
+                mode: "same-origin",
+                headers: {'X-CSRFToken': csrftoken},
+            })
+            data = await response.json()
+            if (data.format == "show") {
+                listEntry = document.createElement("li")
+                if (document.getElementById("empty_list_notif") != null) {
+                    document.getElementById("empty_list_notif").remove()
+                }
+                listEntry.appendChild(document.createTextNode(data.title + " | Seasons: " 
+                + String(data.seasons) + " | Episodes: " + String(data.episodes)))
+                var currentPlace = document.createElement("div")
+                currentPlace.innerText = "Current Season: 1 | Current Episode: 1"
+                currentPlace.className = "current_place"
+                listEntry.appendChild(currentPlace)
+                var updateButton = document.createElement("input")
+                updateButton.type = "button"
+                updateButton.value = "Update Place"
+                updateButton.dataset.entry = data.entryID
+                updateButton.dataset.season = 1
+                updateButton.dataset.episode = 1
+                updateButton.onclick = updatePlace
+                listEntry.appendChild(updateButton) 
+            } else {
+                listEntry = document.createElement("li")
+                if (document.getElementById("empty_list_notif") != null) {
+                    document.getElementById("empty_list_notif").remove()
+                }
+                listEntry.appendChild(document.createTextNode(data.title + " | Running Time: " 
+                + String(data.runtime) + " Minutes | Release Year: " + String(data.releaseYear)))
+                listEntry.appendChild(document.createElement("br"))
+            }
+            var deleteButton = document.createElement("input")
+            deleteButton.type = "button"
+            deleteButton.value = "Delete Entry"
+            deleteButton.dataset.entry = data.entryID
+            deleteButton.onclick = deleteEntry
+            
+            listEntry.appendChild(deleteButton)
+            document.getElementById("show_list").appendChild(listEntry)
+            inputError.hidden = true
+            document.getElementById("custom_title").value = null
+            document.getElementById("custom_season_count").value = null
+            document.getElementById("custom_episode_count").value = null
+            document.getElementById("only_episodes").value = null
+            document.getElementById("custom_runtime").value = null
+            document.getElementById("custom_release_year").value = null
+        } catch(error) {
+            console.error(error)
+            inputError.hidden = false
+        }
+    }
     
     showAutoSubmit.onclick = async function() {
         showAutoSubmit.disabled = true
