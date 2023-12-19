@@ -70,6 +70,10 @@ ul li{
     grid-template-columns: 1fr 2fr;
 }
 
+#list{
+    color: #ed7d5e;
+}
+
 iframe{
     width: 90%;
     height: 500px;

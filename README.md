@@ -10,6 +10,13 @@ It is made using Django as the backend and vanilla HTML/CSS/JS for frontend. Som
 * Run `python manage.py migrate` to generate a database
 * Run `python manage.py runserver` to start the development server 
 
+## Known Bugs
+* It takes two clicks to get to a different list in 'My Lists'.
+* Clicking inline with a list will open/close it.
+* A user can enter a current place in a TV show that can go out of bounds of the show's season and episode count.
+* Negative values are accepted 
+* The page quickly flashes when loading in the entries partial view.
+
 ## Acknowledgments
 The following are resources used in the making of this project: 
 * [Django](https://www.djangoproject.com/) documentation
