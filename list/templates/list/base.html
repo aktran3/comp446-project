@@ -7,9 +7,13 @@
         <title>{% block title %}Media List{% endblock %}</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% comment %} Alpine.JS include {% endcomment %}
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        {% comment %} HTMX include {% endcomment %}
         <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
+        {% comment %} CSS {% endcomment %}
         <link rel="stylesheet" type="text/css" href="{% static 'list/style.css' %}"> 
+        {% comment %} Font {% endcomment %}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis">     
     </head>
     <body>

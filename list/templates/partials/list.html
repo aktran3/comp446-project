@@ -10,12 +10,12 @@
                     {% if entry.onlyEpisodes %}
                         {{entry.title}} | Episodes: {{entry.episodeCount}}
                         <div class="current_place">Current Episode: {{entry.currentEpisode}}</div>
-                        <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
+                        <input type="button" class="episode_button" value="Update Place In Show" data-entry="{{entry.entryid}}" 
                         data-season="no" data-episode="{{entry.currentEpisode}}">
                     {% else %}
                         {{entry.title}} | Seasons: {{entry.seasonCount}} | Episodes: {{entry.episodeCount}}
                         <div class="current_place">Current Season: {{entry.currentSeason}} | Current Episode: {{entry.currentEpisode}}</div>
-                        <input type="button" class="episode_button" value="Update Place" data-entry="{{entry.entryid}}" 
+                        <input type="button" class="episode_button" value="Update Place In Show" data-entry="{{entry.entryid}}" 
                         data-season="{{entry.currentSeason}}" data-episode="{{entry.currentEpisode}}">
                     {% endif %}
                 {% else %}
