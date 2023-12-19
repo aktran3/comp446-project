@@ -4,18 +4,22 @@ This is a project made for Internet Computing in 8 weeks, from proposal to produ
 It is made using Django as the backend and vanilla HTML/CSS/JS for frontend. Some help from Alpine.js and htmx were used to supplement JS. 
 
 ## Setup Instructions
-* Create a virtual environment activate it
-* Install the required dependencies with `pip install -r requirements.txt`
-* In `list/views.py`, change the email in the `User Agent` to your email. 
-* Run `python manage.py migrate` to generate a database
-* Run `python manage.py runserver` to start the development server 
+1. Create a virtual environment activate it
+    * We followed these guides for [Windows](https://mothergeo-py.readthedocs.io/en/latest/development/how-to/venv-win.html) and for [Mac](https://realpython.com/lessons/creating-virtual-environment/) to set up our virtual environments.    
+2. Install the required dependencies with `pip install -r requirements.txt`
+3. Run `python manage.py createsuperuser` to create an admin account for the list app.
+4. In `list/views.py`, change the email in the `User Agent` to your email. 
+5. Run `python manage.py migrate` to generate a database
+6. Run `python manage.py runserver` to start the development server 
 
 ## Known Bugs
 * It takes two clicks to get to a different list in 'My Lists'.
 * Clicking inline with a list will open/close it.
 * A user can enter a current place in a TV show that can go out of bounds of the show's season and episode count.
-* Negative values are accepted 
+    * Negative values are accepted as well.
 * The page quickly flashes when loading in the entries partial view.
+* Site searches for titles in English, regardless of what user settings are set to.
+* No current method to delete lists.
 
 ## Acknowledgments
 The following are resources used in the making of this project: 
