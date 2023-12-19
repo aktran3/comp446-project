@@ -45,19 +45,31 @@
 </div>
 <form id="add_custom_entry" action="{{list_id}}/add_custom" method="post">
     {% csrf_token %}
-    <input type="text" name="title" placeholder="Show Title">
-    <label for="seasonCount">Season Count:</label>
-    <input type="number" name="seasonCount">
-    <label for="episodeCount">Episode Count:</label>
-    <input type="number" name="episodeCount">
-    <input type="checkbox" name="onlyEpisodes">
-    <label for="episodeCount">Don't Count Seasons</label>
+    <select id="media_type_manual" name="mediaType">
+        <option value="show">TV Show</option>
+        <option value="movie">Movie</option>
+    </select>
+    <input type="text" name="title" placeholder="Title">
+    <div id="manual_show_form" aria-roledescription="a divider that holds the input fields for manually adding tv shows">
+        <label for="seasonCount">Season Count:</label>
+        <input type="number" name="seasonCount">
+        <label for="episodeCount">Episode Count:</label>
+        <input type="number" name="episodeCount">
+        <label for="onlyEpisodes">Don't Count Seasons</label>
+        <input type="checkbox" name="onlyEpisodes">
+    </div>
+    <div id="manual_movie_form" aria-roledescription="a divider that holds the input fields for manually adding movies">
+        <label for="runningTimeForm">Running Time (Minutes):</label>
+        <input type="number" name="runningTimeForm">
+        <label for="releaseYearForm">Release Year:</label>
+        <input type="number" name="releaseYearForm">
+    </div>
     <iframe src="https://en.wikipedia.org/wiki/Main_Page" title="Wikipedia"></iframe>
     </br>
     <input type="submit" id="add_show_custom" value="Add to List">
 </form>
 </br>
-<input type="button" id="entry_mode_button" value="Switch to manual show entry">
+<input type="button" id="entry_mode_button" value="Switch to manual show/movie entry">
 {% csrf_token %}
 <script>
     var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -69,19 +81,34 @@
 
     var customEntryForm = document.getElementById("add_custom_entry")
     customEntryForm.hidden = true
+    var customMovieDiv = document.getElementById("manual_movie_form")
+    customMovieDiv.hidden = true
+    var customShowDiv = document.getElementById("manual_show_form")
+
     var autoEntryForm = document.getElementById("add_auto_entry")
+
+    document.getElementById("media_type_manual").onclick = function() {
+        let mediaType = this.value
+        if (mediaType == "movie") {
+            customMovieDiv.hidden = false
+            customShowDiv.hidden = true
+        } else {
+            customMovieDiv.hidden = true
+            customShowDiv.hidden = false
+        }
+    }
 
     document.getElementById("entry_mode_button").onclick = function() {
         autoEntryMode = !autoEntryMode
         if (autoEntryMode) {
             customEntryForm.hidden = true
             autoEntryForm.hidden = false
-            this.value = "Switch to manual show entry"
+            this.value = "Switch to manual show/movie entry"
         } else {
             customEntryForm.hidden = false
             autoEntryForm.hidden = true
             inputError.hidden = true
-            this.value = "Switch to automatic show entry"
+            this.value = "Switch to automatic show/movie entry"
         }
     }
 
@@ -147,7 +174,6 @@
         showAutoSubmit.disabled = true
         showAutoSubmit.value = "Looking up show info..."
         showAutoInput.disabled = true
-        console.log(document.getElementById("mediaType").value)
         var data = null;
         var listEntry = null;
         try {

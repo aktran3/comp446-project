@@ -20,7 +20,7 @@
         <nav>
             <ul>
                 <div class="main-nav">
-                <li><img src="{% static 'logo.png' %}", alt="logo" width="75px"></li>
+                <li><img src="{% static 'logo.png' %}", alt="site logo (An icon of a TV set containg the words 'show me')" width="75px"></li>
                     <li><a href="{% url 'homepage' %}">About</a></li>
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'index' %}">My Lists</a></li>

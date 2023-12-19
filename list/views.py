@@ -61,18 +61,24 @@ def add_custom_entry(request, id):
         newEntryID = 1
     else:
         newEntryID = newEntryID + 1
-    if (values['seasonCount'] == ""):
-        customSeasonCount = 1
+    if (values['mediaType'] == "show"):
+        if (values['seasonCount'] == ""):
+            customSeasonCount = 1
+        else:
+            customSeasonCount = int(values['seasonCount'])
+        if (values.get('onlyEpisodes') != None):
+            justEpisodes = True
+        else:
+            justEpisodes = False
+        newEntry = Entry(title=values['title'], seasonCount=customSeasonCount, episodeCount=int(values['episodeCount']),
+        list=List.objects.get(listid=id), entryid=newEntryID, currentEpisode=1, currentSeason=1, onlyEpisodes=justEpisodes, isTelevision=True)
+        newEntry.save()
     else:
-        customSeasonCount = int(values['seasonCount'])
-    if (values.get('onlyEpisodes') != None):
-        justEpisodes = True
-    else:
-        justEpisodes = False
-    newEntry = Entry(title=values['title'], seasonCount=customSeasonCount, episodeCount=int(values['episodeCount']),
-    list=List.objects.get(listid=id), entryid=newEntryID, currentEpisode=1, currentSeason=1, onlyEpisodes=justEpisodes)
-    newEntry.save()
-    return HttpResponseRedirect('/list/' + str(id))
+        newEntry = Entry(title=values['title'], releaseYear=int(values['releaseYearForm']), runtime=int(values['runningTimeForm']),
+        list=List.objects.get(listid=id), entryid=newEntryID, isTelevision=False)
+        newEntry.save()
+    return HttpResponseRedirect('/list/')
+    
 
 def add_tv(request, id):
     defaultcountry = Settings.objects.get(userid=request.user.id).defaultcountry
@@ -100,8 +106,7 @@ def add_tv(request, id):
             foundTitle = foundTitle.group()
     else:
         foundTitle = foundTitle.group()
-    foundTitle = foundTitle.replace("<title>&lt;i>", "")
-    foundTitle = foundTitle.replace("&lt;", "")
+    foundTitle = foundTitle.replace("<title>&lt;i>", "").replace("&lt;", "").replace("&amp;", "&")
 
     foundEpisodes = re.search("\"num_episodes\":\{\"wt\":\"(&lt;onlyinclude>)*(\d|,)+", str(requestHTML)).group()
     foundEpisodes = foundEpisodes.replace("\"num_episodes\":{\"wt\":\"", "").replace("&lt;onlyinclude>", "").replace(",", "")
@@ -148,8 +153,7 @@ def add_movie(request, id):
             foundTitle = foundTitle.group()
     else:
         foundTitle = foundTitle.group()
-    foundTitle = foundTitle.replace("<title>&lt;i>", "")
-    foundTitle = foundTitle.replace("&lt;", "")
+    foundTitle = foundTitle.replace("<title>&lt;i>", "").replace("&lt;", "").replace("&amp;", "&")
 
     foundRuntime = foundRuntime = re.search("\"runtime\":{\"wt\":\"(\d)+", str(requestHTML)).group()
     foundRuntime = foundRuntime.replace("\"runtime\":{\"wt\":\"", "")
