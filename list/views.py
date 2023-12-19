@@ -187,7 +187,7 @@ def create_user(request):
             user.save()
             userSettings = Settings(userid = user.id, defaultcountry = values['country'].capitalize())
             userSettings.save()
-            return HttpResponseRedirect('')
+            return HttpResponseRedirect('/list/')
         else:
             return HttpResponseRedirect('/new_user/')
     else:
