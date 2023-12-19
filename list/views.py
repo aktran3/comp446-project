@@ -45,7 +45,6 @@ def list(request, id):
         if (request.user.id == list_object.userid):
             entry_list = Entry.objects.filter(list__listid = id).order_by('title')
             context = {'entry_list': entry_list, 'list_title': list_object.listname, 'list_id': id}
-            # return render(request, 'list/list.html', context)
             return render(request, 'partials/list.html', context)
         else:
             return HttpResponseRedirect('/list/')
